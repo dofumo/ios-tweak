@@ -1,0 +1,9 @@
+Package: com.dofumo.azotapanel
+Name: AzotaPanel
+Version: 0.1.0
+Architecture: iphoneos-arm64
+Description: A small native floating panel UI for Azota Student. UI shell only; no test-content extraction or automation.
+Maintainer: dofumo
+Author: dofumo
+Section: Tweaks
+Depends: mobilesubstrate
