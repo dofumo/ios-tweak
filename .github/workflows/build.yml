@@ -1,0 +1,43 @@
+name: Build AzotaPanel tweak
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+
+permissions:
+  contents: read
+
+jobs:
+  build-rootless:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Theos
+        uses: Randomblock1/theos-action@v1
+        with:
+          # Use an absolute path: the action changes into the SDK directory
+          # before moving downloaded SDKs into $THEOS/sdks.
+          theos-dir: ${{ github.workspace }}/theos
+          theos-src: https://github.com/theos/theos
+          theos-sdks: https://github.com/theos/sdks
+          theos-sdks-branch: master
+
+      - name: Build rootless package
+        env:
+          THEOS: ${{ github.workspace }}/theos
+        run: |
+          make clean
+          make package THEOS_PACKAGE_SCHEME=rootless FINALPACKAGE=1
+          mkdir -p output
+          cp packages/*.deb output/
+          find .theos/obj -name 'AzotaPanel.dylib' -type f -exec cp {} output/ \;
+
+      - name: Upload deb and dylib
+        uses: actions/upload-artifact@v4
+        with:
+          name: AzotaPanel-rootless
+          path: output/*
+          if-no-files-found: error
